@@ -1,6 +1,6 @@
 package com.kozlovskaya.network.storage.client;
 
-import com.kozlovskaya.network.storage.common.AbstractMessage;
+import com.kozlovskaya.network.storage.common.messages.AbstractMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
