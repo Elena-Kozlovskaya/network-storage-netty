@@ -1,6 +1,7 @@
 package com.kozlovskaya.network.storage.client;
 
-import com.kozlovskaya.network.storage.common.FileMessage;
+import com.kozlovskaya.network.storage.common.Constants;
+import com.kozlovskaya.network.storage.common.messages.file.FileRequest;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -30,49 +31,38 @@ public class ClientApp {
                     .handler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
                         protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
-                            //для каждого соединения открывается новый канал
-                            // инициализируем канал, содержит массив сущностей для работы
-                            //new StringEncoder(), new StringDecoder() - преобразование объектов в массив байт, важен порядок энкодеров и декодеров слева направо
                             nioSocketChannel.pipeline().addLast(
                                     new ObjectEncoder(),// разбирает объект на байтбуфы и отправляет
                                     new ObjectDecoder(100 * 1024 * 1024, ClassResolvers.cacheDisabled(null)), // принимает байтбуфы и собирает в объект
                                     new ClientDecoder()
                             );
-                            //   new StringDecoder(),//преобразовали ByteBuf в String
-                            // new ByteArrayEncoder(),//3.преобразовали массив байт в ByteBuf
-                            // new LengthFieldPrepender(4)); //положение неверно - добавляет первые 4 байта для каждого сообщения, которые содержат размер сообщения
-                            //   new MessageEncoder(),//2.преобразовали строку в массив байт
-                            // new ClientDecoder());//1. (исх.сообщение) отправил строку
                         }
                     });
 
-            ChannelFuture future = client.connect("localhost", 9000).sync();
+            ChannelFuture future = client.connect(Constants.HOST, Constants.PORT).sync();
             System.out.println("Client started");
+
+            //Временное решение вместо GUI
             while (true) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        Path path = Paths.get(line);
+                        String[] parts = line.split("\\s+", 2);
+                        System.out.println(parts.length);
+                        String command = parts[0];
+                        Path path = Paths.get(parts[1]);
+                        System.out.println(command);
+                        System.out.println(path);
 
                         if (Files.exists(path) & Files.isRegularFile(path)) {
-                            FileMessage fileMessage = new FileMessage(path);
-                            System.out.println("Создан файл с именем: " + fileMessage.getFilename());
-                            future.channel().writeAndFlush(fileMessage).sync();
+                            FileRequest fileRequest = new FileRequest(path, command);
+                            System.out.println("Создан FileRequest содержащий данные файла: " + fileRequest.getFilename());
+                            future.channel().writeAndFlush(fileRequest).sync();
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                /*while (true) {
-
-                    // writeAndFlush - запиши в буффер и отправь на сервер
-                    // заменить на write if(содержит знак конца меседжа) {flush()}
-                    future.channel().writeAndFlush("Hello from client!").sync();
-
-                    Thread.sleep(5000);
-                }
-            }*/
             }
         } finally {
             group.shutdownGracefully();
