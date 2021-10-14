@@ -1,33 +1,14 @@
 package com.kozlovskaya.network.storage.common.messages.file;
 
-import com.kozlovskaya.network.storage.common.messages.AbstractMessage;
-import com.kozlovskaya.network.storage.common.messages.Request;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.kozlovskaya.network.storage.common.messages.Response;
 
 
-//запрос, содержащий файл и команду
-public class FileRequest extends Request {
+public class FileResponse extends Response {
 
     private String fileName;
     private long filePosition;
     private long fileSize;
     byte[] fileData;
-
-    private String command;
-
-    public FileRequest(){
-
-    }
-
-    public FileRequest(Path path, String command) throws IOException {
-        this.fileName = path.getFileName().toString();
-        this.command = command;
-        this.fileSize = Files.size(path);
-        this.fileData = Files.readAllBytes(path);
-    }
 
     public String getFileName() {
         return fileName;
@@ -59,13 +40,5 @@ public class FileRequest extends Request {
 
     public void setFileData(byte[] fileData) {
         this.fileData = fileData;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public void setCommand(String command) {
-        this.command = command;
     }
 }

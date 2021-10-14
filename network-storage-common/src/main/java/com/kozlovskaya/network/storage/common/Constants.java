@@ -15,9 +15,13 @@ public class Constants {
 
     public static final String CLIENTS_LIST = "/clients";
 
-    public static final String CREATE_FILE = "/crf";
+    public static final String DOWNLOAD_FILE = "/dwf";
+
+    public static final String UPLOAD_FILE = "/upf";
 
     public static final String UPDATE_FILE = "/udf";
+
+    public static final String DELETE_FILE = "/delf";
 
 
 }

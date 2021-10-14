@@ -4,7 +4,7 @@ import com.kozlovskaya.network.storage.common.*;
 import com.kozlovskaya.network.storage.common.messages.AbstractMessage;
 import com.kozlovskaya.network.storage.common.messages.file.FileMessage;
 import com.kozlovskaya.network.storage.common.messages.file.FileRequest;
-import com.kozlovskaya.network.storage.common.messages.service.Responds;
+import com.kozlovskaya.network.storage.common.messages.service.ServiceResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -15,6 +15,7 @@ import java.nio.file.StandardOpenOption;
 public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessage> {
 
     private static String serverStorage = "C:\\Users\\Elena\\IdeaProjects\\network-storage\\server_storage";
+    private ServiceResponse serviceResponse = new ServiceResponse();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -32,15 +33,17 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessage> 
 
         if (message instanceof FileRequest) {
             FileRequest fileRequest = (FileRequest) message;
-
-            if (fileRequest.getCommand().equals(Constants.CREATE_FILE)) {
-                if (!Files.exists(Paths.get(serverStorage + fileRequest.getFilename()))) {
-                    Files.write(Paths.get(serverStorage, fileRequest.getFilename()), fileRequest.getFileData(), StandardOpenOption.CREATE_NEW);
-                    ctx.writeAndFlush(new Responds("File " + fileRequest.getFilename() + " created in " + serverStorage));
+            if (fileRequest.getCommand().equals(Constants.DOWNLOAD_FILE)) {
+                if (!Files.exists(Paths.get(serverStorage + fileRequest.getFileName()))) {
+                    Files.write(Paths.get(serverStorage, fileRequest.getFileName()), fileRequest.getFileData(), StandardOpenOption.CREATE_NEW);
+                    this.serviceResponse.setResponse("File " + fileRequest.getFileName() + " created in " + serverStorage);
+                    ctx.writeAndFlush(serviceResponse);
                 } else {
-                    ctx.writeAndFlush(new Responds("File " + fileRequest.getFilename() + " is already exists in " + serverStorage));
+                    ServiceResponse serviceResponse = new ServiceResponse();
+                    this.serviceResponse.setResponse("File " + fileRequest.getFileName() + " is already exists in " + serverStorage);
+                    ctx.writeAndFlush(serviceResponse);
                 }
-                FileMessage fileMessage = new FileMessage(Paths.get(serverStorage + fileRequest.getFilename()));
+                FileMessage fileMessage = new FileMessage(Paths.get(serverStorage + fileRequest.getFileName()));
                 ctx.writeAndFlush(fileMessage);
             } else {
                 System.out.println("Command is wrong");
@@ -51,9 +54,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessage> 
             FileMessage fileMessage = (FileMessage) message;
             if (!Files.exists(Paths.get(serverStorage + fileMessage.getFilename()))) {
                 Files.write(Paths.get(serverStorage + fileMessage.getFilename()), fileMessage.getData(), StandardOpenOption.CREATE_NEW);
-                ctx.writeAndFlush(new Responds("File created in " + serverStorage + fileMessage.getFilename()));
+                this.serviceResponse.setResponse("File created in " + serverStorage + fileMessage.getFilename());
+                ctx.writeAndFlush(serviceResponse);
             } else {
-                ctx.writeAndFlush(new Responds("File " + fileMessage.getFilename() + " is already exists in " + serverStorage));
+                this.serviceResponse.setResponse("File " + fileMessage.getFilename() + " is already exists in " + serverStorage);
+                ctx.writeAndFlush(serviceResponse);
             }
         }
     }

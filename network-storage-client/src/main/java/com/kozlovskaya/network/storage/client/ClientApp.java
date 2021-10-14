@@ -56,8 +56,14 @@ public class ClientApp {
 
                         if (Files.exists(path) & Files.isRegularFile(path)) {
                             FileRequest fileRequest = new FileRequest(path, command);
-                            System.out.println("Создан FileRequest содержащий данные файла: " + fileRequest.getFilename());
+                            System.out.println("Создан FileRequest содержащий данные файла: " + fileRequest.getFileName());
                             future.channel().writeAndFlush(fileRequest).sync();
+                            if (!future.isSuccess()){
+                                future.cause().printStackTrace();
+                            }
+                            if(future.isSuccess()){
+                                System.out.println("FileRequest отправлен на сервер");
+                            }
                         }
                     }
                 } catch (IOException e) {
