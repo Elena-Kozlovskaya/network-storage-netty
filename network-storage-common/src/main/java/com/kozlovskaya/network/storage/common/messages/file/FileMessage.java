@@ -1,10 +1,12 @@
-package com.kozlovskaya.network.storage.common;
+package com.kozlovskaya.network.storage.common.messages.file;
+
+import com.kozlovskaya.network.storage.common.messages.AbstractMessage;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileMessage extends AbstractMessage{
+public class FileMessage extends AbstractMessage {
     private String filename;
     private byte[] data;
 

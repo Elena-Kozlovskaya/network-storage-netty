@@ -1,7 +1,7 @@
 package com.kozlovskaya.network.storage.client;
 
-import com.kozlovskaya.network.storage.common.AbstractMessage;
-import com.kozlovskaya.network.storage.common.FileResponds;
+import com.kozlovskaya.network.storage.common.messages.AbstractMessage;
+import com.kozlovskaya.network.storage.common.messages.service.ServiceResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -9,9 +9,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class ClientDecoder extends SimpleChannelInboundHandler<AbstractMessage> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage message) throws Exception {
-        if (message instanceof FileResponds) {
-            FileResponds fileResponds = (FileResponds) message;
-            System.out.println(fileResponds.getResponds());
+        if (message instanceof ServiceResponse) {
+            ServiceResponse serviceResponse = (ServiceResponse) message;
+            System.out.println(serviceResponse.getResponse());
         }
 
     }

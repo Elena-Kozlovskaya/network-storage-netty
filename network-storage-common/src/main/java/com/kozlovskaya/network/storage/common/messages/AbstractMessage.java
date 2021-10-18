@@ -1,4 +1,4 @@
-package com.kozlovskaya.network.storage.common;
+package com.kozlovskaya.network.storage.common.messages;
 
 import java.io.Serializable;
 
