@@ -2,9 +2,6 @@ package com.kozlovskaya.network.storage.Server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kozlovskaya.network.storage.common.messages.Request;
-import com.kozlovskaya.network.storage.common.messages.Response;
-import com.kozlovskaya.network.storage.common.messages.file.FileRequest;
-import com.kozlovskaya.network.storage.common.messages.service.ServiceRequest;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
@@ -17,8 +14,8 @@ public class JsonDecoder extends MessageToMessageDecoder<byte[]> {
     @Override
     protected void decode(ChannelHandlerContext ctx, byte[] message, List<Object> out) throws Exception {
         System.out.println("byte[] пришел на сервер");
-        ServiceRequest serviceRequest = objectMapper.readValue(message, ServiceRequest.class);
-        out.add(serviceRequest);
+        Request request = objectMapper.readValue(message, Request.class);
+        out.add(request);
     }
 
     @Override

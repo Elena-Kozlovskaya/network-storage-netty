@@ -1,14 +1,12 @@
 package com.kozlovskaya.network.storage.client;
 
-import com.kozlovskaya.network.storage.client.handlers.FileHandler;
+import com.kozlovskaya.network.storage.client.handlers.ClientFileHandler;
+import com.kozlovskaya.network.storage.client.handlers.ClientSender;
 import com.kozlovskaya.network.storage.client.handlers.JsonDecoder;
 import com.kozlovskaya.network.storage.client.handlers.JsonEncoder;
-import com.kozlovskaya.network.storage.common.messages.Request;
-import com.kozlovskaya.network.storage.common.messages.file.FileRequest;
-import com.kozlovskaya.network.storage.common.messages.service.ServiceRequest;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -20,16 +18,22 @@ import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Client {
+    private Channel currentChannel;
+
     public static void main(String[] args) throws InterruptedException {
         new Client().start();
     }
 
+    public Channel getCurrentChannel() {
+        return currentChannel;
+    }
+
     public void start() throws InterruptedException {
+
         NioEventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap client = new Bootstrap();
@@ -51,8 +55,9 @@ public class Client {
                                     new ByteArrayEncoder(),
                                     new JsonDecoder(),
                                     new JsonEncoder(),
-                                    new FileHandler()
+                                    new ClientFileHandler()
                             );
+                            currentChannel = ch;
                         }
                     });
 
@@ -70,32 +75,7 @@ public class Client {
                         Path path = Paths.get(parts[1]);
                         System.out.println(command);
                         System.out.println(path);
-
-                        if (Files.exists(path) & Files.isRegularFile(path)) {
-                            FileRequest fileRequest = new FileRequest(path, command);
-                            System.out.println("Создан FileRequest содержащий данные файла: " + fileRequest.getFileName());
-                            channelFuture.channel().writeAndFlush(fileRequest).sync();
-                            if (!channelFuture.isSuccess()){
-                                channelFuture.cause().printStackTrace();
-                            }
-                            if(channelFuture.isSuccess()){
-                                System.out.println("FileRequest отправлен на сервер");
-                            }
-                        } else {
-                            ServiceRequest serviceRequest = new ServiceRequest();
-                            serviceRequest.setCommand(command);
-                            serviceRequest.setFileName(path.getFileName().toString());
-                            System.out.println("Создан ServiceRequest c запросом для файла: " + serviceRequest.getFileName());
-                            channelFuture.channel().writeAndFlush(serviceRequest).sync();
-                            if (!channelFuture.isSuccess()){
-                                channelFuture.cause().printStackTrace();
-                            }
-                            if(channelFuture.isSuccess()){
-                                System.out.println("ServiceRequest доставлен на сервер");
-                            }
-                        }
-
-
+                        ClientSender.sendFile(path, command, currentChannel, channelFuture);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -112,7 +92,7 @@ public class Client {
         }
     }
 
-    public void open(){
+    public void open() {
 
     }
 }

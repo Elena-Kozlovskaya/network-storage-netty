@@ -1,6 +1,6 @@
 package com.kozlovskaya.network.storage.Server;
 
-import com.kozlovskaya.network.storage.common.*;
+import com.kozlovskaya.network.storage.common.Constants;
 import com.kozlovskaya.network.storage.common.messages.AbstractMessage;
 import com.kozlovskaya.network.storage.common.messages.file.FileMessage;
 import com.kozlovskaya.network.storage.common.messages.file.FileRequest;
