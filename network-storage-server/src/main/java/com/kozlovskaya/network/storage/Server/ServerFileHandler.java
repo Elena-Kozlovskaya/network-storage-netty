@@ -13,11 +13,18 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerFileHandler extends SimpleChannelInboundHandler<Request> {
 
     private static String serverStorage = "C:\\Users\\Elena\\IdeaProjects\\network-storage\\server_storage";
     private ServiceResponse serviceResponse = new ServiceResponse();
+    private ExecutorService executorService;
+
+    public ServerFileHandler() {
+        executorService = Executors.newSingleThreadExecutor();
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Request message) {
@@ -27,7 +34,9 @@ public class ServerFileHandler extends SimpleChannelInboundHandler<Request> {
             String fileName = Paths.get(serverStorage, message.getFileName()).toString();
             Path path = Paths.get(serverStorage, message.getFileName());
             if (Files.exists(path)) {
-                byte[] buffer = new byte[1024 * 512];
+
+           /*    executorService.execute(() ->{*/
+                   byte[] buffer = new byte[1024 * 512];
                 try (RandomAccessFile accessFile = new RandomAccessFile(fileName, "r")) {
                     while (true) {
                         FileResponse fileResponse = new FileResponse();
@@ -54,6 +63,7 @@ public class ServerFileHandler extends SimpleChannelInboundHandler<Request> {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            /*});*/
             } else {
                 System.out.println("Нет такого файла");
                 //если нет такого файла отправить сообщ об ошибке

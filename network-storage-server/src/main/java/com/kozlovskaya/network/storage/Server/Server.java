@@ -43,7 +43,8 @@ public class Server {
                                     new ByteArrayEncoder(),
                                     new JsonDecoder(),
                                     new JsonEncoder(),
-                                    new ServerFileHandler()
+                                    new NewServerHandler()/*,
+                                    new ServerFileHandler()*/
                             );
                         }
                     })

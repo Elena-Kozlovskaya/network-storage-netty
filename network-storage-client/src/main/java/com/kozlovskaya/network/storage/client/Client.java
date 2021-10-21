@@ -1,9 +1,6 @@
 package com.kozlovskaya.network.storage.client;
 
-import com.kozlovskaya.network.storage.client.handlers.ClientFileHandler;
-import com.kozlovskaya.network.storage.client.handlers.ClientSender;
-import com.kozlovskaya.network.storage.client.handlers.JsonDecoder;
-import com.kozlovskaya.network.storage.client.handlers.JsonEncoder;
+import com.kozlovskaya.network.storage.client.handlers.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -54,8 +51,8 @@ public class Client {
                                     new ByteArrayDecoder(),
                                     new ByteArrayEncoder(),
                                     new JsonDecoder(),
-                                    new JsonEncoder(),
-                                    new ClientFileHandler()
+                                    new JsonEncoder()/*,
+                                    new ClientFileHandler()*/
                             );
                             currentChannel = ch;
                         }
@@ -75,7 +72,7 @@ public class Client {
                         Path path = Paths.get(parts[1]);
                         System.out.println(command);
                         System.out.println(path);
-                        ClientSender.sendFile(path, command, currentChannel, channelFuture);
+                        NewClientSender.sendFile(path, command, currentChannel, channelFuture);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
